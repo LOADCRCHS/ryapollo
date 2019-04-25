@@ -10,17 +10,27 @@ class ApolloClient
     map(key)
   end
 
-  def map
-    http_get(default_url)
+  def map(is_cache = false)
+    http_get(uncache_url)
   end
 
-  def http_get(url, headers={})
-    resuorce = RestClient::Resource.new(url, timeout: 15, open_timeout: 15)
+  def cache_http_get(headers={})
+    resuorce = RestClient::Resource.new(cache_url, timeout: 15, open_timeout: 15)
     JSON.parse(resuorce.get(:params => headers))
   end
 
-  def default_url()
-    url = "http://localhost:8080/configfiles/json/SampleApp/default/application"
+  def uncache_http_get(url, headers={})
+    resuorce = RestClient::Resource.new(uncache_url, timeout: 15, open_timeout: 15)
+    JSON.parse(resuorce.get(:params => headers))
+  end
+
+  def cache_url()
+    url = "http://localhost:8080/configfiles/json/#{@app_id}/#{cluster_name}/#{name_space}"
+    url
+  end
+
+  def uncache_url(releaseKey = "")
+    url = "http://localhost:8080/configs/#{@app_id}/#{cluster_name}/#{name_space}?releaseKey=#{releaseKey}"
     url
   end
 end
